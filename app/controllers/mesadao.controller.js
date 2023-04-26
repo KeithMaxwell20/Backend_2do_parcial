@@ -45,7 +45,6 @@ exports.create = (req, res) => {
         message: err.message || "Ha ocurrido un error al crear una mesa.",
       });
     });
-  console.log("AAAAAAAAAAAAAAAA: " + req.body.restauranteId);
 };
 
 exports.findOne = (req, res) => {
