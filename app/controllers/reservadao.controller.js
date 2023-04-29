@@ -157,6 +157,106 @@ exports.findAllByRestaurante = (req, res) => {
       });
     });
 };
+// Todas las reservas por fecha
+// Ex de formato: "2023-03-28 GMT-0400"
+exports.findAllByFecha = (req, res) => {
+  console.log("Fecha query: " + req.query.fecha);
+  const fecha = new Date(Date.parse(req.query.fecha));
+  console.log("Fecha es: " + fecha);
+  Reserva.findAll({
+    where: {
+      fecha: fecha,
+    },
+  })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message ||
+          "Ha ocurrido un error al obtener las reservas con fecha=" + fecha,
+      });
+    });
+};
+// Todas las reservas por restaurante y fecha
+// Ex de formato: "2023-03-28 GMT-0400"
+exports.findAllByRestFecha = (req, res) => {
+  const fecha = new Date(Date.parse(req.query.fecha));
+  const RestauranteId = req.query.RestauranteId;
+  Reserva.findAll({
+    where: {
+      RestauranteId: RestauranteId,
+      fecha: fecha,
+    },
+  })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message ||
+          "Ha ocurrido un error al obtener las reservas del restaurante con id=" +
+            RestauranteId +
+            "en fecha = " +
+            fecha,
+      });
+    });
+};
+// Todas las reservas por cliente
+exports.findAllByCliente = (req, res) => {
+  const ClienteId = req.params.ClienteId;
+  Reserva.findAll({
+    where: {
+      ClienteId: ClienteId,
+    },
+  })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message ||
+          "Ha ocurrido un error al obtener las reservas con cliente id =" +
+            ClienteId,
+      });
+    });
+};
+// Todas las reservas por restaurante && cliente && fecha
+// Ordenamos por horario (Creciente) y mesa (Creciente)
+exports.findAllByRestauranteClienteFecha = (req, res) => {
+  const RestauranteId = req.query.RestauranteId;
+  const ClienteId = req.query.ClienteId;
+  const fecha = req.query.fecha;
+  Reserva.findAll({
+    where: {
+      RestauranteId: RestauranteId,
+      ClienteId: ClienteId,
+      fecha: fecha,
+    },
+    order: [
+      ["rangoHora", "ASC"],
+      ["MesaId", "ASC"],
+    ],
+  })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          "Error al obtener las reservas registradas con ClienteId: " +
+          ClienteId +
+          ", RestauranteId: " +
+          RestauranteId +
+          "y Fecha: " +
+          fecha,
+      });
+    });
+};
+
 // Todas las reservas por mesa
 exports.findAllByMesa = (req, res) => {
   const MesaId = req.params.id;

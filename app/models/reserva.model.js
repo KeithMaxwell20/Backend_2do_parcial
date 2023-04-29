@@ -8,7 +8,7 @@ module.exports = (sequelize, Sequelize) => {
       autoIncrement: true,
     },
     fecha: {
-      type: Sequelize.DATEONLY,
+      type: Sequelize.DATE,
     },
     // '["2016-01-01 00:00:00+00:00", "2016-02-01 00:00:00+00:00")'
     rangoHora: {
@@ -34,7 +34,8 @@ module.exports = (sequelize, Sequelize) => {
         checkDateHour(value) {
           let horaInicio = new Date(Date.parse(value[0]));
           let horaFin = new Date(Date.parse(value[1]));
-          let fecha = new Date(this.fecha);
+          let fecha = new Date(Date.parse(this.fecha));
+
           if (
             fecha.getDate() != horaInicio.getDate() ||
             fecha.getDate() != horaFin.getDate()
