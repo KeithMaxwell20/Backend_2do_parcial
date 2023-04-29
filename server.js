@@ -3,6 +3,8 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
 const db = require("./app/models");
+const { extraSetup } = require("./app/models/associations");
+
 db.sequelize.sync();
 
 var corsOptions = {

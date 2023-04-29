@@ -8,13 +8,6 @@ module.exports = (sequelize, Sequelize) => {
     nombre: {
       type: Sequelize.STRING,
     },
-    restauranteId: {
-      type: Sequelize.BIGINT,
-      references: {
-        model: "Restaurantes",
-        key: "id",
-      },
-    },
     posicionX: {
       type: Sequelize.INTEGER,
     },

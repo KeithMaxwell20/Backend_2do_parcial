@@ -9,9 +9,9 @@ exports.create = (req, res) => {
       message: "¡Debe enviar el nombre de la mesa!",
     });
     return;
-  } else if (!req.body.restauranteId) {
+  } else if (!req.body.RestauranteId) {
     res.status(400).send({
-      message: "¡Debe enviar el id del restaurante en restauranteId!",
+      message: "¡Debe enviar el id del restaurante en RestauranteId!",
     });
     return;
   } else if (!req.body.posicionX || !req.body.posicionY) {
@@ -29,7 +29,7 @@ exports.create = (req, res) => {
   // Crea la mesa
   const mesa = {
     nombre: req.body.nombre,
-    restauranteId: req.body.restauranteId,
+    RestauranteId: req.body.RestauranteId,
     posicionX: req.body.posicionX,
     posicionY: req.body.posicionY,
     planta: req.body.planta,
@@ -73,10 +73,10 @@ exports.findAll = (req, res) => {
 };
 // Todas las mesas de acuerdo al id del restaurante
 exports.findAllByRestaurante = (req, res) => {
-  const restauranteId = req.params.id;
+  const RestauranteId = req.params.id;
   Mesa.findAll({
     where: {
-      restauranteId: restauranteId,
+      RestauranteId: RestauranteId,
     },
   })
     .then((data) => {
@@ -87,17 +87,17 @@ exports.findAllByRestaurante = (req, res) => {
         message:
           err.message ||
           "Ha ocurrido un error al obtener las mesas del restaurante con id=" +
-            restauranteId,
+            RestauranteId,
       });
     });
 };
 // Todas las mesas de acuerdo al id del restaurante y al piso en el que se encuentren
 exports.findAllByRestaurantePlanta = (req, res) => {
-  const restauranteId = req.query.restId;
+  const RestauranteId = req.query.RestauranteId;
   const planta = req.query.planta;
   Mesa.findAll({
     where: {
-      restauranteId: restauranteId,
+      RestauranteId: RestauranteId,
       planta: planta,
     },
   })
@@ -111,7 +111,7 @@ exports.findAllByRestaurantePlanta = (req, res) => {
           "Ha ocurrido un error al obtener las mesas de la planta=" +
             planta +
             " del restaurante con id=" +
-            restauranteId,
+            RestauranteId,
       });
     });
 };
