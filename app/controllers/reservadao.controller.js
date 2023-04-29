@@ -1,9 +1,10 @@
 const e = require("cors");
 const db = require("../models");
 const Reserva = db.Reserva;
+const Mesa = db.Mesa;
 const op = db.Sequelize.Op;
 
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
   // Valida request
   if (!req.body.RestauranteId) {
     res.status(400).send({
@@ -14,26 +15,46 @@ exports.create = (req, res) => {
     res.status(400).send({
       message: "¡Debe enviar el id de la mesa!",
     });
+    return;
   } else if (!req.body.fecha) {
     res.status(400).send({
       message: "¡Debe enviar la fecha de reserva!",
     });
+    return;
   } else if (!req.body.ClienteId) {
     res.status(400).send({
       message: "¡Debe enviar el id del cliente!",
     });
+    return;
   } else if (!req.body.horaInicio) {
     res.status(400).send({
       message: "¡Debe enviar la hora de inicio!",
     });
+    return;
   } else if (!req.body.horaFin) {
     res.status(400).send({
       message: "¡Debe enviar la hora de finalizacion!",
     });
+    return;
   } else if (!req.body.cantidad) {
     res.status(400).send({
       message: "¡Debe enviar la cantidad de comensales!",
     });
+    return;
+  }
+
+  // Validamos que la cantidad a reservar no supere la cantidad
+  // de comensales disponibles para dicha mesa.
+  // Validamos no se exceda la cantidad maxima de comensales en la mesa
+  const mesa = await Mesa.findByPk(req.body.MesaId);
+  if (mesa.comensales < req.body.cantidad) {
+    res.status(400).send({
+      message:
+        "La cantidad solicitada excede la capacidad de la mesa (" +
+        mesa.comensales +
+        ")!",
+    });
+    return;
   }
 
   let fecha = new Date(Date.parse(req.body.fecha));
@@ -62,10 +83,28 @@ exports.create = (req, res) => {
         res.send(data);
       })
       .catch((err) => {
-        res.status(500).send({
-          message:
-            err.message || "Ha ocurrido un error al registrar una reserva.",
-        });
+        if (err.name === "SequelizeUniqueConstraintError") {
+          res.status(500).send({
+            message:
+              "La mesa con id=" +
+              req.body.MesaId +
+              " ya se encuentra reservada para la fecha " +
+              req.body.fecha +
+              " de " +
+              req.body.horaInicio +
+              " a " +
+              req.body.horaFin +
+              "horas\nNo se puede registrar la reserva.",
+          });
+        } else if (err.name === "SequelizeValidationError") {
+          res.status(500).send({
+            message: err.errors[0].message,
+          });
+        } else {
+          res.status(500).send({
+            message: err || "Error al registrar la reserva.",
+          });
+        }
       });
   } catch (err) {
     res.status(500).send({

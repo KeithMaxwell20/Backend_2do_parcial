@@ -1,4 +1,5 @@
-const Mesa = require("./mesa.model.js");
+const db = require(".");
+const Mesa = db.Mesa;
 module.exports = (sequelize, Sequelize) => {
   const Reserva = sequelize.define("Reserva", {
     id: {
@@ -20,12 +21,12 @@ module.exports = (sequelize, Sequelize) => {
           // Verificando que hora inicio es una hora menor que horaFin
           // y hora inicio este de 12 a 22.
           if (
-            auxTime != horaFin.getTime() &&
-            horaInicio.getHour() < 12 &&
-            horaInicio.getHour() > 22
+            auxTime != horaFin.getTime() ||
+            horaInicio.getHours() < 12 ||
+            horaInicio.getHours() > 22
           ) {
             throw new Error(
-              "Solo se permiten los siguientes intervalos (horas):" +
+              "Solo se permiten los siguientes intervalos (en horas):" +
                 " 12 a 13, 13 a 14, 14 a 15, 19 a 20, 20 a 21, 21 a 22, 22 a 23"
             );
           }
@@ -48,19 +49,6 @@ module.exports = (sequelize, Sequelize) => {
     },
     cantidad: {
       type: Sequelize.INTEGER,
-      //validate: {
-      // Validamos no se exceda la cantidad maxima de comensales en la mesa
-      //  checkCantidad(value) {
-      //    const mesa = Mesa.findByPk(this.mesaId);
-      //    if (mesa.comensales < value) {
-      //      throw new Error(
-      //        "La cantidad solicitada excede la capacidad de la mesa (" +
-      //          mesa.comensales +
-      //          ")!"
-      //      );
-      //    }
-      //  },
-      //},
     },
   });
   return Reserva;
