@@ -1,5 +1,6 @@
 const dbConfig = require("../config/db.config.js");
 const Sequelize = require("sequelize");
+const { extraSetup } = require("./associations.js");
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
@@ -19,4 +20,35 @@ db.Ventas = require("./venta.model.js")(sequelize, Sequelize);
 db.Restaurante = require("./restaurante.model.js")(sequelize, Sequelize);
 db.Mesa = require("./mesa.model.js")(sequelize, Sequelize);
 db.Cliente = require("./cliente.model.js")(sequelize, Sequelize);
+db.Reserva = require("./reserva.model.js")(sequelize, Sequelize);
+
+sync();
+// Agregando las asociaciones
+extraSetup(db);
+
+// Agregando constraint de unicidad para las reservas.
+db.sequelize.queryInterface
+  .addConstraint("Reservas", {
+    fields: ["MesaId", "fecha", "rangoHora"],
+    type: "unique",
+    name: "composite_unique_mesaId_fecha_rangoHora",
+  })
+  .catch((err) => {
+    console.log(err),
+      console.log(
+        'The constraint "composite_unique_mesaId_fecha_rangoHora" already exists!!'
+      );
+  });
+
+function sync() {
+  db.sequelize
+    .sync({ force: false, alter: true })
+    .then(function () {
+      console.log("database has been synced");
+    })
+    .catch(function () {
+      console.log("unable to sync database");
+    });
+}
+
 module.exports = db;

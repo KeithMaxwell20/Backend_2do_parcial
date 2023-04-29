@@ -3,6 +3,8 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
 const db = require("./app/models");
+const { extraSetup } = require("./app/models/associations");
+
 db.sequelize.sync();
 
 var corsOptions = {
@@ -26,6 +28,7 @@ require("./app/routes/venta.routes")(app);
 require("./app/routes/restaurante.routes")(app);
 require("./app/routes/mesa.routes")(app);
 require("./app/routes/cliente.routes")(app);
+require("./app/routes/reserva.routes")(app);
 
 app.listen(PORT, () => {
   console.log("Servidor corriendo en puerto 9090.");
