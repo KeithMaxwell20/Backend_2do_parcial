@@ -41,9 +41,26 @@ exports.create = (req, res) => {
       res.send(data);
     })
     .catch((err) => {
-      res.status(500).send({
-        message: err.message || "Ha ocurrido un error al crear una mesa.",
-      });
+      console.log(err);
+      if (err.name === "SequelizeUniqueConstraintError") {
+        res.status(500).send({
+          message:
+            "La mesa no puede ubicarse en la posicion (X, Y)=(" +
+            req.body.posicionX +
+            ", " +
+            req.body.posicionY +
+            ")" +
+            " en el piso " +
+            req.body.planta +
+            ", del restaurante con id=" +
+            req.body.RestauranteId +
+            " porque ya se encuentra ocupado.",
+        });
+      } else {
+        res.status(500).send({
+          message: err.message || "Ha ocurrido un error al crear una mesa.",
+        });
+      }
     });
 };
 

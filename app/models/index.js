@@ -40,6 +40,21 @@ db.sequelize.queryInterface
       );
   });
 
+// Agregando constraint de unicidad para las posiciones de las mesas (combinacion
+// de posicion+piso+restaurante no se puede repetir).
+db.sequelize.queryInterface
+  .addConstraint("Mesas", {
+    fields: ["RestauranteId", "posicionX", "posicionY", "planta"],
+    type: "unique",
+    name: "composite_unique_RestauranteId_posicionXY_planta",
+  })
+  .catch((err) => {
+    console.log(err),
+      console.log(
+        'The constraint "composite_unique_RestauranteId_posicionXY_planta" already exists!!'
+      );
+  });
+
 function sync() {
   db.sequelize
     .sync({ force: false, alter: true })
