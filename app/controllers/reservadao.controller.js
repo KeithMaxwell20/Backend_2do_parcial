@@ -230,12 +230,14 @@ exports.findAllByRestauranteClienteFecha = (req, res) => {
   const RestauranteId = req.query.RestauranteId;
   const ClienteId = req.query.ClienteId;
   const fecha = req.query.fecha;
+  var whereStatement = {};
+  whereStatement.RestauranteId = RestauranteId;
+  whereStatement.fecha = fecha;
+  if (ClienteId) {
+    whereStatement.ClienteId = ClienteId;
+  }
   Reserva.findAll({
-    where: {
-      RestauranteId: RestauranteId,
-      ClienteId: ClienteId,
-      fecha: fecha,
-    },
+    where: whereStatement,
     order: [
       ["rangoHora", "ASC"],
       ["MesaId", "ASC"],
