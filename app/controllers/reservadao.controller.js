@@ -127,7 +127,19 @@ exports.findOne = (req, res) => {
 };
 // Todas las reservas
 exports.findAll = (req, res) => {
-  Reserva.findAll()
+  Reserva.findAll({
+    include: [
+      {
+        model: db.Restaurante,
+      },
+      {
+        model: db.Cliente,
+      },
+      {
+        model: db.Mesa,
+      },
+    ],
+  })
     .then((data) => {
       res.send(data);
     })
@@ -144,6 +156,17 @@ exports.findAllByRestaurante = (req, res) => {
     where: {
       RestauranteId: RestauranteId,
     },
+    include: [
+      {
+        model: db.Restaurante,
+      },
+      {
+        model: db.Cliente,
+      },
+      {
+        model: db.Mesa,
+      },
+    ],
   })
     .then((data) => {
       res.send(data);
@@ -167,6 +190,17 @@ exports.findAllByFecha = (req, res) => {
     where: {
       fecha: fecha,
     },
+    include: [
+      {
+        model: db.Restaurante,
+      },
+      {
+        model: db.Cliente,
+      },
+      {
+        model: db.Mesa,
+      },
+    ],
   })
     .then((data) => {
       res.send(data);
@@ -189,6 +223,17 @@ exports.findAllByRestFecha = (req, res) => {
       RestauranteId: RestauranteId,
       fecha: fecha,
     },
+    include: [
+      {
+        model: db.Restaurante,
+      },
+      {
+        model: db.Cliente,
+      },
+      {
+        model: db.Mesa,
+      },
+    ],
   })
     .then((data) => {
       res.send(data);
@@ -211,6 +256,17 @@ exports.findAllByCliente = (req, res) => {
     where: {
       ClienteId: ClienteId,
     },
+    include: [
+      {
+        model: db.Restaurante,
+      },
+      {
+        model: db.Cliente,
+      },
+      {
+        model: db.Mesa,
+      },
+    ],
   })
     .then((data) => {
       res.send(data);
@@ -242,6 +298,17 @@ exports.findAllByRestauranteClienteFecha = (req, res) => {
       ["rangoHora", "ASC"],
       ["MesaId", "ASC"],
     ],
+    include: [
+      {
+        model: db.Restaurante,
+      },
+      {
+        model: db.Cliente,
+      },
+      {
+        model: db.Mesa,
+      },
+    ],
   })
     .then((data) => {
       res.send(data);
@@ -266,6 +333,17 @@ exports.findAllByMesa = (req, res) => {
     where: {
       MesaId: MesaId,
     },
+    include: [
+      {
+        model: db.Restaurante,
+      },
+      {
+        model: db.Cliente,
+      },
+      {
+        model: db.Mesa,
+      },
+    ],
   })
     .then((data) => {
       res.send(data);

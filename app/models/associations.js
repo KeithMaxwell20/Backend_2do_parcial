@@ -6,11 +6,12 @@ function extraSetup(db) {
   Restaurante.hasMany(Mesa);
   //  Mesa.belongsTo(Restaurante);
   Restaurante.hasMany(Reserva, { as: "restauranteId" });
-  //  Reserva.belongsTo(Restaurante);
+  Reserva.belongsTo(Restaurante);
   Mesa.hasMany(Reserva, { as: "mesaId" });
+  Reserva.belongsTo(Mesa);
   //  Restaurante.belongsTo(Mesa);
   Cliente.hasMany(Reserva, { as: "clienteId" });
-  //  Reserva.belongsTo(Cliente);
+  Reserva.belongsTo(Cliente);
 }
 
 module.exports = { extraSetup };
