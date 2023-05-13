@@ -80,7 +80,22 @@ exports.create = async (req, res) => {
     // Guardamos en la base de datos
     Reserva.create(reserva)
       .then((data) => {
-        res.send(data);
+        Reserva.findByPk(data.id, {
+          include: [
+            {
+              model: db.Restaurante,
+            },
+            {
+              model: db.Cliente,
+            },
+            {
+              model: db.Mesa,
+            },
+          ],
+        }).then((data) => {
+          res.send(data);
+        });
+        //        res.send(data);
       })
       .catch((err) => {
         if (err.name === "SequelizeUniqueConstraintError") {
