@@ -21,6 +21,7 @@ db.Restaurante = require("./restaurante.model.js")(sequelize, Sequelize);
 db.Mesa = require("./mesa.model.js")(sequelize, Sequelize);
 db.Cliente = require("./cliente.model.js")(sequelize, Sequelize);
 db.Reserva = require("./reserva.model.js")(sequelize, Sequelize);
+db.Producto = require("./producto.model.js")(sequelize, Sequelize);
 
 sync();
 // Agregando las asociaciones
