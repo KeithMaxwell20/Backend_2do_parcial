@@ -1,16 +1,21 @@
 module.exports = (sequelize, Sequelize) => {
-    const Producto = sequelize.define("Producto", {
+    const Categoria = sequelize.define("Categoria", {
         id: {
             type: Sequelize.BIGINT,
             primaryKey: true,
             autoIncrement: true,
         },
-        nombre: {
+        nombre:{
             type: Sequelize.STRING,
         },
-        precio_venta: {
-            type: Sequelize.BIGINT,
-        }
     });
-    return Producto;
+    return Categoria;
 };
+
+
+
+
+
+
+
+

@@ -30,6 +30,7 @@ require("./app/routes/mesa.routes")(app);
 require("./app/routes/cliente.routes")(app);
 require("./app/routes/reserva.routes")(app);
 require("./app/routes/services.routes")(app);
+require("./app/routes/categoria.routes")(app);
 require("./app/routes/producto.routes")(app);
 
 app.listen(PORT, () => {
