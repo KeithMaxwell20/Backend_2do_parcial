@@ -23,7 +23,8 @@ db.Cliente = require("./cliente.model.js")(sequelize, Sequelize);
 db.Reserva = require("./reserva.model.js")(sequelize, Sequelize);
 db.Categoria = require("./categoria.model.js")(sequelize, Sequelize);
 db.Producto = require("./producto.model.js")(sequelize, Sequelize);
-
+db.ConsumoHeader = require("./consumoheader.model.js")(sequelize, Sequelize);
+db.ConsumoDetalle = require("./consumodetails.model.js")(sequelize, Sequelize);
 
 sync();
 // Agregando las asociaciones

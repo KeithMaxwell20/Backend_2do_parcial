@@ -1,6 +1,8 @@
 const db = require("../models");
 const Reserva = db.Reserva;
 const Mesa = db.Mesa;
+const ConsumoHeader = db.ConsumoHeader;
+const Cliente = db.Cliente;
 const Op = db.Sequelize.Op;
 
 // Retorna la lista de mesas con tiempo libre disponible
@@ -61,6 +63,154 @@ exports.findMesasSinReservas = (req, res) => {
     .catch((err) => {
       res.status(500).send({
         message: err || "Error al obtener la lista reservaciones.",
+      });
+    });
+};
+
+// ¿Cómo agregar/quitar un cliente de una mesa?
+// La idea es que esta funcionalidad se encuentre separada de las reservas.
+// El cliente llega al restaurante y menciona que tiene una reserva ya hecha, el
+// trabajador del restaurante revisa eso y si verifica que es real, registra
+// el cliente a la mesa. Una vez que la reserva se termina, manualmente
+// trabajador debe liberar la mesa.
+
+// Cerrar o abrir mesas.
+// Actualizamos la mesa, so.
+// Cuando cerramos la mesa, ya no se puede volver a agregar consumoDetalles a esa mesa,
+// y todos los detalles de consumo agregados que existen han sido agregados a la cabecera
+// anterior.(cerrado es tener la mesa liberada para un nuevo cliente)
+// Cuando abrimos la mesa, se crea una nueva cabecera detalle al cual agregar cada nuevo
+// detalle. (abierto es cuando registramos un cliente a la mesa)
+// req: { idMesa: idMesa, idCliente: idCliente}
+// Esta funcion es para abrir una mesa (registrar nuevo ConsumoHeader, verificar que no se encuentre
+// actualmente abierta, etc.)
+exports.crearConsumoHeader = (req, res) => {
+  if (!req.body.idMesa) {
+    res.status(400).send({
+      message: "¡Debe enviar el id de la mesa!",
+    });
+  }
+  if (!req.body.idCliente) {
+    res.status(400).send({
+      message: "¡Debe enviar el id del cliente!",
+    });
+  }
+
+  Mesa.findByPk(req.body.idMesa)
+    .then((mesa) => {
+      console.log("Mesa encontrada es: " + mesa.id);
+      Cliente.findByPk(req.body.idCliente)
+        .then((cliente) => {
+          console.log("Encontramos al cliente: " + cliente.id);
+          ConsumoHeader.findOne({
+            where: { MesaId: mesa.id },
+            order: [["createdAt", "DESC"]],
+          })
+            .then((consumoHeader) => {
+              console.log("ConsumoHeader es: " + consumoHeader);
+              // Si es null, entonces no existe el consumoHeader (aun no ha sido creado)
+              if (!consumoHeader || consumoHeader.estado === "cerrado") {
+                // Si el estado es cerrado, significa que el que se puede agregar un nuevo headerConsumo.
+                let fechaHora = new Date();
+                const consumoHeader = {
+                  // Guardamos el cliente para que ocupe la mesa
+                  ClienteId: cliente.id,
+                  // Guardamos la mesa a ocupar
+                  MesaId: mesa.id,
+                  // Marcamos la mesa como abierto
+                  estado: "abierto",
+                  // Creamos el ConsumoHeader para esta mesa.
+                  total: 0,
+                  fechaConsumo: fechaHora,
+                  fechaCierre: null,
+                };
+
+                // Creamos el ConsumoHeader y retornamos
+                ConsumoHeader.create(consumoHeader)
+                  .then((data) => {
+                    // Retornamos el objeto creado.
+                    ConsumoHeader.findByPk(data.id, {
+                      include: [
+                        {
+                          model: db.Mesa,
+                        },
+                        {
+                          model: db.Cliente,
+                        },
+                      ],
+                    }).then((consumoHeaderCreado) => {
+                      res.send(consumoHeaderCreado);
+                    });
+                  })
+                  .catch((err) => {
+                    res.status(500).send({
+                      message:
+                        "No se pudo crear un nuevo ConsumoHeader!!" || err,
+                    });
+                  });
+              } else if (consumoHeader.estado === "abierto") {
+                res.status(500).send({
+                  message:
+                    "No se puede registrar un nuevo consumoHeader porque la mesa no se encuentra liberada (cerrada)",
+                });
+              }
+            })
+            .catch((err) => {
+              res.status(500).send({
+                message:
+                  "Error al buscar el ultimo registrado consumoHeader! " + err,
+              });
+            });
+        })
+        .catch((err) => {
+          res.status(500).send({
+            message: "Error al buscar al cliente a ocupar la mesa! " + err,
+          });
+        });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: "Error al buscar la mesa a ocupar!",
+      });
+    });
+};
+
+// Verificamos si una mesa esta abierta o cerrada.
+// Retorna "disponible" si se encuentra disponible,
+// "ocupado" si se encuentra ocupado actualmente.
+exports.verificarMesaLibre = (req, res) => {
+  if (!req.params.id) {
+    res.status(400).send({
+      message: "¡Debe enviar el id de la mesa a verificar!",
+    });
+  }
+
+  Mesa.findByPk(req.params.id)
+    .then((mesa) => {
+      ConsumoHeader.findOne({
+        where: { MesaId: mesa.id },
+        order: [["createdAt", "DESC"]],
+      })
+        .then((consumoHeader) => {
+          if (!consumoHeader || consumoHeader.estado === "cerrado") {
+            res.status(200).send({
+              message: "disponible",
+            });
+          } else if (consumoHeader.estado === "abierto") {
+            res.status(200).send({
+              message: "ocupado",
+            });
+          }
+        })
+        .catch((err) => {
+          res.status(500).send({
+            message: "Error al verificar el estado de la mesa con id=" + req.id,
+          });
+        });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: "Error al buscar la mesa a verificar!",
       });
     });
 };

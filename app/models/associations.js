@@ -5,6 +5,8 @@ function extraSetup(db) {
   const Reserva = db.Reserva;
   const Categoria = db.Categoria;
   const Producto = db.Producto;
+  const ConsumoHeader = db.ConsumoHeader;
+  const ConsumoDetalle = db.ConsumoDetalle;
 
   Restaurante.hasMany(Mesa);
   //  Mesa.belongsTo(Restaurante);
@@ -19,7 +21,19 @@ function extraSetup(db) {
   // Producto.belognsTo(Categoria)
   Producto.belongsTo(Categoria);
   Categoria.hasMany(Producto, { as: "categoriaId" });
-  
+
+  Mesa.hasMany(ConsumoHeader, { as: "consumoHeaderId" });
+  ConsumoHeader.belongsTo(Mesa);
+
+  //  ConsumoHeader.hasOne(ConsumoHeader, { as: "clienteId"});
+  ConsumoHeader.belongsTo(Cliente);
+
+  ConsumoHeader.hasMany(ConsumoDetalle, { as: "consumoDetalleId" });
+  ConsumoDetalle.belongsTo(ConsumoHeader);
+
+  //  ConsumoDetalle.hasOne(Producto);
+  Producto.hasMany(ConsumoDetalle);
+  //Producto.belongsTo(ConsumoDetalle);
 }
 
 module.exports = { extraSetup };
