@@ -204,13 +204,57 @@ exports.verificarMesaLibre = (req, res) => {
         })
         .catch((err) => {
           res.status(500).send({
-            message: "Error al verificar el estado de la mesa con id=" + req.id,
+            message:
+              "Error al verificar el estado de la mesa con id=" + req.params.id,
           });
         });
     })
     .catch((err) => {
       res.status(500).send({
         message: "Error al buscar la mesa a verificar!",
+      });
+    });
+};
+
+// Cerramos una mesa que se encontraba ocupada
+// Se genera un pdf tipo ticket, con los datos
+// de la consumicion de la mesa, datos de
+// cliente y actualizamos la fecha de
+// cierre de la mesa.
+// Se recibe el id de la mesa a cerrar.
+exports.cerrarConsumoHeader = (req, res) => {
+  if (!req.params.id) {
+    res.status(400).send({
+      message: "¡Debe enviar el id de la mesa a cerrar!",
+    });
+  }
+
+  Mesa.findByPk(req.params.id)
+    .then((mesa) => {
+      ConsumoHeader.findOne({
+        where: { MesaId: mesa.id },
+        order: [["createdAt", "DESC"]],
+      })
+        .then((consumoHeader) => {
+          if (!consumoHeader || consumoHeader.estado === "cerrado") {
+            res.status(500).send({
+              message: "La mesa no se encuentra ocupada!",
+            });
+          } else if (consumoHeader.estado === "abierto") {
+            //TO-DO: Generar el pdf a enviar.
+            res.sendFile("Test.pdf", { root: "./tickets/" });
+          }
+        })
+        .catch((err) => {
+          res.status(500).send({
+            message:
+              "Error al cerrar la mesa con id=" + req.params.id + ": " + err,
+          });
+        });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: "Error al buscar la mesa a cerrar!",
       });
     });
 };
