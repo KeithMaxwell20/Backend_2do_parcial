@@ -18,7 +18,7 @@ function extraSetup(db) {
 
   // Producto.belognsTo(Categoria)
   Producto.belongsTo(Categoria);
-  Categoria.hasMany(Producto, { as: "categoriaid" });
+  Categoria.hasMany(Producto, { as: "categoriaId" });
   
 }
 

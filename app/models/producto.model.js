@@ -10,7 +10,7 @@ module.exports = (sequelize, Sequelize) => {
         },
         precio_venta: {
             type: Sequelize.BIGINT,
-        }
+        },
     });
     return Producto;
 };

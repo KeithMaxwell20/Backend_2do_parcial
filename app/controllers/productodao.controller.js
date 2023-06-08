@@ -13,7 +13,7 @@ exports.create = (req, res) => {
     //Crea el Producto
     const producto = {
         nombre: req.body.nombre,
-        CategoriaId:req.body.categoriaId,
+        CategoryId:req.body.categoriaId,
         precio_venta: req.body.precioVenta
     };
     // Guardamos en la base de datos
@@ -30,7 +30,14 @@ exports.create = (req, res) => {
 // Producto por Id
 exports.findOne = (req, res) => {
     const id = req.params.id;
-    Producto.findByPk(id)
+    Producto.findByPk(id,{
+        include:[
+            {
+                model: db.Categoria
+            },
+        ], 
+    })
+    
         .then((data) => {
             res.send(data);
         })
@@ -43,7 +50,13 @@ exports.findOne = (req, res) => {
 
 // Todos los productos
 exports.findAll = (req, res) => {
-    Producto.findAll()
+    Producto.findAll({
+        include: [
+            {
+              model: db.Categoria,
+            },
+          ],
+    })
         .then((data) => {
             res.send(data);
         })
