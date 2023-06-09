@@ -57,7 +57,7 @@ exports.create = (req, res) => {
                       "Prodcuto.precio_venta: " + producto.precio_venta
                     );
                     // Guardamos el nuevo total de esta factura ConsumoHeader
-                    total += producto.precio_venta * 3;
+                    total += producto.precio_venta * req.body.cantidad;
                     consumoHeader.total = total;
                     consumoHeader.save();
                     //ConsumoHeader.update(

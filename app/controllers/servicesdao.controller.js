@@ -1,4 +1,5 @@
 const db = require("../models");
+const { crearFactura } = require("../logic/crearFactura");
 const Reserva = db.Reserva;
 const Mesa = db.Mesa;
 const ConsumoHeader = db.ConsumoHeader;
@@ -229,11 +230,12 @@ exports.cerrarConsumoHeader = (req, res) => {
     });
   }
 
-  Mesa.findByPk(req.params.id)
+  Mesa.findByPk(req.params.id, { include: [{ model: db.Restaurante }] })
     .then((mesa) => {
       ConsumoHeader.findOne({
         where: { MesaId: mesa.id },
         order: [["createdAt", "DESC"]],
+        include: [{ model: db.Cliente }],
       })
         .then((consumoHeader) => {
           if (!consumoHeader || consumoHeader.estado === "cerrado") {
@@ -242,7 +244,65 @@ exports.cerrarConsumoHeader = (req, res) => {
             });
           } else if (consumoHeader.estado === "abierto") {
             //TO-DO: Generar el pdf a enviar.
-            res.sendFile("Test.pdf", { root: "./tickets/" });
+            // Generamos la fecha de cierre.
+            const fechaCierre = new Date();
+            consumoHeader.fechaCierre = fechaCierre;
+
+            // Traemos los detalles
+            db.ConsumoDetalle.findAll({
+              where: { ConsumoHeaderId: consumoHeader.id },
+              include: [{ model: db.Producto }],
+            })
+              .then((lista) => {
+                let total = 0;
+                let datos = {
+                  mesaId: mesa.id,
+                  planta: mesa.planta,
+                  nombresCliente: consumoHeader.Cliente.nombre,
+                  apellidosCliente: consumoHeader.Cliente.apellido,
+                  cedulaCliente: consumoHeader.Cliente.cedula,
+                };
+                let listaDetalles = [];
+                lista.forEach((item) => {
+                  let detalle = {
+                    nombreProducto: item.Producto.nombre,
+                    precioUnitario: item.Producto.precio_venta,
+                    cantidad: item.cantidad,
+                    precioTotal: item.Producto.precio_venta * item.cantidad,
+                    fechaHora: item.createdAt.toLocaleString("es-PY", {
+                      timeZone: "America/Asuncion",
+                    }),
+                  };
+                  listaDetalles.push(detalle);
+                });
+                datos.total = consumoHeader.total;
+                datos.encabezado = "Factura de Consumición";
+                datos.nombreRestaurante = mesa.Restaurante.nombre;
+                datos.fechaCierre = consumoHeader.fechaCierre.toLocaleString(
+                  "es-PY",
+                  { timeZone: "America/Asuncion" }
+                );
+                consumoHeader.estado = "cerrado";
+                consumoHeader.save();
+                const nombreArchivo =
+                  "Consumicion-X" + consumoHeader.id + ".pdf";
+                console.log(nombreArchivo);
+                crearFactura(
+                  datos,
+                  listaDetalles,
+                  "./tickets/" + nombreArchivo
+                );
+                setTimeout(function () {
+                  res.sendFile(nombreArchivo, {
+                    root: "./tickets/",
+                  });
+                }, 3000);
+              })
+              .catch((err) => {
+                res.status(500).send({
+                  message: "Error al listar los detalles de una mesa!" + err,
+                });
+              });
           }
         })
         .catch((err) => {
@@ -254,7 +314,7 @@ exports.cerrarConsumoHeader = (req, res) => {
     })
     .catch((err) => {
       res.status(500).send({
-        message: "Error al buscar la mesa a cerrar!",
+        message: "Error al buscar la mesa a cerrar!" + err,
       });
     });
 };

@@ -9,7 +9,7 @@ function extraSetup(db) {
   const ConsumoDetalle = db.ConsumoDetalle;
 
   Restaurante.hasMany(Mesa);
-  //  Mesa.belongsTo(Restaurante);
+  Mesa.belongsTo(Restaurante);
   Restaurante.hasMany(Reserva, { as: "restauranteId" });
   Reserva.belongsTo(Restaurante);
   Mesa.hasMany(Reserva, { as: "mesaId" });
@@ -33,6 +33,7 @@ function extraSetup(db) {
 
   //  ConsumoDetalle.hasOne(Producto);
   Producto.hasMany(ConsumoDetalle);
+  ConsumoDetalle.belongsTo(Producto);
   //Producto.belongsTo(ConsumoDetalle);
 }
 
