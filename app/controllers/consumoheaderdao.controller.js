@@ -57,7 +57,16 @@ exports.cambiarCliente = (req, res) => {
   Cliente.findByPk(req.body.clienteId)
     .then((cliente) => {
       console.log("Cliente con id: " + cliente.id);
-      ConsumoHeader.findByPk(req.body.consumoHeaderId)
+      ConsumoHeader.findByPk(req.body.consumoHeaderId, {
+        include: [
+          {
+            model: db.Mesa,
+          },
+          {
+            model: db.Cliente,
+          },
+        ],
+      })
         .then((consumoHeader) => {
           console.log("consumoHeader con id: " + consumoHeader.id);
           consumoHeader.ClienteId = cliente.id;

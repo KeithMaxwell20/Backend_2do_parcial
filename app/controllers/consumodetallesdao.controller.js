@@ -115,7 +115,7 @@ exports.findAll = (req, res) => {
     where: {
       ConsumoHeaderId: req.params.id,
     },
-    include: [{ model: db.Producto }],
+    include: [{ model: db.Producto, include: [db.Categoria] }],
   })
     .then((consumoDetalles) => {
       res.status(200).send(consumoDetalles);
