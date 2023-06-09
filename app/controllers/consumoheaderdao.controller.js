@@ -18,6 +18,14 @@ exports.getConsumoHeader = (req, res) => {
       ConsumoHeader.findOne({
         where: { MesaId: mesa.id },
         order: [["createdAt", "DESC"]],
+        include: [
+          {
+            model: db.Mesa,
+          },
+          {
+            model: db.Cliente,
+          },
+        ],
       })
         .then((consumoHeader) => {
           res.send(consumoHeader);
