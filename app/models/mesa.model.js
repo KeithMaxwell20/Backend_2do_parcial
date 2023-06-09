@@ -1,7 +1,7 @@
 module.exports = (sequelize, Sequelize) => {
   const Mesa = sequelize.define("Mesa", {
     id: {
-      type: Sequelize.BIGINT,
+      type: Sequelize.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },

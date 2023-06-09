@@ -3,7 +3,7 @@ const Mesa = db.Mesa;
 module.exports = (sequelize, Sequelize) => {
   const Reserva = sequelize.define("Reserva", {
     id: {
-      type: Sequelize.BIGINT,
+      type: Sequelize.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
